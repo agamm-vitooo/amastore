@@ -1,0 +1,25 @@
+// Model Produk
+model Product {
+  id          Int       @id @default(autoincrement()) // ID Produk (Primary Key)
+  name        String    // Nama Produk
+  description String    // Deskripsi Produk
+  price       Float     // Harga Produk
+  categoryId  Int       // Foreign Key ke Category
+  category    Category  @relation(fields: [categoryId], references: [id]) // Relasi ke Category
+  createdAt   DateTime  @default(now()) // Tanggal Dibuat
+  updatedAt   DateTime  @updatedAt      // Tanggal Diperbarui
+}
+
+// Model Kategori
+model Category {
+  id       Int       @id @default(autoincrement()) // ID Kategori (Primary Key)
+  name     String    // Nama Kategori
+  products Product[] // Relasi satu ke banyak dengan Product
+}
+
+// Model Testimonial
+model Testimonial {
+  id        Int      @id @default(autoincrement()) // ID Testimonial (Primary Key)
+  photo     String   // URL atau path foto testimonial
+  createdAt DateTime @default(now()) // Tanggal Dibuat
+}
