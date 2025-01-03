@@ -1,16 +1,25 @@
-import { createApp } from 'vue';
-import App from '../App.vue';
+// router/index.js
 import { createRouter, createWebHistory } from 'vue-router';
+import { useAuthStore } from '../store/auth.js';
 
-//client
+// Client Routes
 import Home from '../pages/Home.vue';
 
-//admin
+// Admin Routes
+import Admin from '../admin/pages/Dashboard.vue';
 import Login from '../admin/pages/Login.vue';
 
 const routes = [
+    // Client Routes
     { path: '/', component: Home },
-    { path: '/login', component: Login },
+
+    // Admin Routes
+    {
+        path: '/admin',
+        component: Admin,
+        meta: { requiresAuth: true },
+    },
+    { path: '/login', component: Login, meta: { hideNavbar: true } },
 ];
 
 const router = createRouter({
@@ -18,4 +27,15 @@ const router = createRouter({
     routes,
 });
 
-export default router
+router.beforeEach((to, from, next) => {
+    const authStore = useAuthStore();
+
+    // Mengecek apakah halaman yang ingin diakses membutuhkan autentikasi
+    if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+        // Jika tidak login, redirect ke halaman login
+        return next('/login');
+    }
+    next();
+});
+
+export default router;

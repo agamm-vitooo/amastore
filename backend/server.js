@@ -2,45 +2,50 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
+dotenv.config();
+const app = express();
+
 // Konfigurasi CORS
 app.use(cors({
-    origin: 'http://localhost:5173', // Izinkan hanya dari origin ini
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Tentukan metode yang diizinkan
-    credentials: true, // Jika Anda memerlukan cookie atau header auth
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
 }));
 
-// Rute API
+app.use(express.json());
+app.options('*', cors({
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+}));
+
 app.get('/api/auth', (req, res) => {
     res.json({ message: 'CORS works!' });
 });
 
-//Auth
+// Auth
 import authRoutes from './routes/authRoute.js';
 
-//Landing Pages
+// Landing Pages
 import heroRoutes from './routes/heroRoute.js';
 import advantageRoutes from './routes/advantageRoute.js';
 import aboutRoutes from './routes/aboutRoute.js';
 import testimonialRoutes from './routes/testimonialRoute.js';
 
-//Katalog
+// Katalog
 import productRoutes from './routes/productRoute.js';
 import categoryRoutes from './routes/categoryRoute.js';
 
-dotenv.config();
-const app = express();
-app.use(express.json());
-
-//Auth
+// Auth
 app.use('/api/auth', authRoutes);
 
-//Landing Pages
+// Landing Pages
 app.use('/api/hero', heroRoutes);
 app.use('/api/advantage', advantageRoutes);
 app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/about', aboutRoutes);
 
-//Katalog
+// Katalog
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 
