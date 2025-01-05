@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 
 export const useAuthStore = defineStore("auth", {
     state: () => ({
-        isAuthenticated: false, // Default: tidak login
+        isAuthenticated: false,
     }),
     getters: {
         role: (state) => (state.isAuthenticated ? "admin" : "client"),

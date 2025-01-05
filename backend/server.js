@@ -20,8 +20,11 @@ app.use(express.json());
 //     res.json({ message: 'CORS works!' });
 // });
 
-// Auth
+// Auth routes
 import authRoutes from './routes/authRoute.js';
+
+// User
+import userRoutes from './routes/userRoute.js';
 
 // Landing Pages
 import heroRoutes from './routes/heroRoute.js';
@@ -33,8 +36,11 @@ import testimonialRoutes from './routes/testimonialRoute.js';
 import productRoutes from './routes/productRoute.js';
 import categoryRoutes from './routes/categoryRoute.js';
 
+// Auth routes
+app.use('/auth', authRoutes);
+
 // Menyusun rute lainnya
-app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
 app.use('/api/hero', heroRoutes);
 app.use('/api/advantage', advantageRoutes);
 app.use('/api/testimonials', testimonialRoutes);

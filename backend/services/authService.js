@@ -1,88 +1,49 @@
-import prisma from '../prismaClient.js';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { db } from '../config/db.js';
 
-// Fungsi untuk menyaring data user (menghapus password)
-export function sanitizeUser(user) {
-    if (!user) return null;
-    const { password, ...sanitizedUser } = user;
-    return sanitizedUser;
-}
+const JWT_SECRET = process.env.JWT_SECRET;
 
-// Layanan User
-export const UserService = {
-    async createUser(email, password, role = "admin") {
-        try {
-            if (!email || !password) {
-                throw new Error("Email and password are required");
-            }
-            // Hash password
-            const hashedPassword = await bcrypt.hash(password, 10);
+export const AuthService = {
+    // Registrasi Pengguna Baru
+    async registerUser(email, password, role) {
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-            // Simpan ke database
-            const newUser = await prisma.user.create({
-                data: {
-                    email,
-                    password: hashedPassword,
-                    role,
-                },
+        const query = 'INSERT INTO users (email, password, role) VALUES (?, ?, ?)';
+        return new Promise((resolve, reject) => {
+            db.query(query, [email, hashedPassword, role], (err, result) => {
+                if (err) reject(err);
+                resolve(result);
             });
-
-            // Kembalikan data user tanpa password
-            return sanitizeUser(newUser);
-        } catch (error) {
-            console.error("Error in createUser:", error.message);
-            throw error;
-        }
+        });
     },
 
-    async getUserById(id) {
-        try {
-            const user = await prisma.user.findUnique({ where: { id } });
-            if (!user) throw new Error("User not found");
-            return sanitizeUser(user);
-        } catch (error) {
-            console.error("Error in getUserById:", error.message);
-            throw error;
-        }
-    },
+    // Login Pengguna dan buat Token
+    async loginUser(email, password) {
+        const query = 'SELECT * FROM users WHERE email = ?';
+        return new Promise((resolve, reject) => {
+            db.query(query, [email], async(err, results) => {
+                if (err) return reject('Database error');
+                if (results.length === 0) return reject('User not found');
 
-    async getAllUsers() {
-        try {
-            const users = await prisma.user.findMany();
-            return users.map(sanitizeUser);
-        } catch (error) {
-            console.error("Error in getAllUsers:", error.message);
-            throw error;
-        }
-    },
+                const user = results[0];
+                const isMatch = await bcrypt.compare(password, user.password);
 
-    async updateUser(id, data) {
-        try {
-            if (data.password) {
-                data.password = await bcrypt.hash(data.password, 10);
-            }
+                if (!isMatch) return reject('Invalid password');
 
-            const updatedUser = await prisma.user.update({
-                where: { id },
-                data,
+                const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
+                resolve(token);
             });
-
-            return sanitizeUser(updatedUser);
-        } catch (error) {
-            console.error("Error in updateUser:", error.message);
-            throw error;
-        }
+        });
     },
 
-    async deleteUser(id) {
-        try {
-            const deletedUser = await prisma.user.delete({
-                where: { id },
+    // Verifikasi Token JWT
+    verifyToken(token) {
+        return new Promise((resolve, reject) => {
+            jwt.verify(token, JWT_SECRET, (err, decoded) => {
+                if (err) return reject('Invalid token');
+                resolve(decoded);
             });
-            return sanitizeUser(deletedUser);
-        } catch (error) {
-            console.error("Error in deleteUser:", error.message);
-            throw error;
-        }
+        });
     },
 };
