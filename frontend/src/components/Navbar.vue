@@ -1,5 +1,5 @@
 <template>
-  <header v-if="!$route.meta.hideNavbar"> 
+  <header v-if="!$route.meta.hideNavbar">
     <nav class="flex justify-between items-center p-4 bg-orange-500">
       <!-- Logo di kiri -->
       <div class="text-white font-bold text-xl">
@@ -8,16 +8,18 @@
 
       <!-- Menu di kanan -->
       <div class="hidden md:flex space-x-6">
-        <router-link to="/" class="text-white hover:text-gray-300">Home</router-link>
-        <router-link to="/katalog" class="text-white hover:text-gray-300">Katalog</router-link>
-        <router-link to="/about" class="text-white hover:text-gray-300">About</router-link>
-        <router-link to="/contact" class="text-white hover:text-gray-300">Contact Us</router-link>
-
-        <!-- Menu Admin (Hanya Ditampilkan Jika Login dan Role Admin) -->
         <template v-if="role === 'admin'">
+          <!-- Menu Admin -->
           <router-link to="/admin/dashboard" class="text-white hover:text-gray-300">Dashboard</router-link>
           <router-link to="/admin/settings" class="text-white hover:text-gray-300">Settings</router-link>
           <button @click="logout" class="text-white hover:text-gray-300">Logout</button>
+        </template>
+
+        <template v-else>
+          <!-- Menu Default -->
+          <router-link to="/katalog" class="text-white hover:text-gray-300">Katalog</router-link>
+          <router-link to="/about" class="text-white hover:text-gray-300">About</router-link>
+          <router-link to="/contact" class="text-white hover:text-gray-300">Contact Us</router-link>
         </template>
       </div>
 
@@ -33,23 +35,25 @@
 
     <!-- Mobile Menu -->
     <div v-if="isMobileMenuOpen" class="md:hidden bg-orange-500 p-4">
-      <router-link to="/" class="block text-white hover:text-gray-300 py-2">Home</router-link>
-      <router-link to="/katalog" class="block text-white hover:text-gray-300 py-2">Katalog</router-link>
-      <router-link to="/about" class="block text-white hover:text-gray-300 py-2">About</router-link>
-      <router-link to="/contact" class="block text-white hover:text-gray-300 py-2">Contact Us</router-link>
-
-      <!-- Menu Admin di Mobile (Hanya Ditampilkan Jika Login dan Role Admin) -->
       <template v-if="role === 'admin'">
+        <!-- Menu Admin -->
         <router-link to="/admin/dashboard" class="block text-white hover:text-gray-300 py-2">Dashboard</router-link>
         <router-link to="/admin/settings" class="block text-white hover:text-gray-300 py-2">Settings</router-link>
         <button @click="logout" class="block text-white hover:text-gray-300 py-2">Logout</button>
+      </template>
+
+      <template v-else>
+        <!-- Menu Default -->
+        <router-link to="/katalog" class="block text-white hover:text-gray-300 py-2">Katalog</router-link>
+        <router-link to="/about" class="block text-white hover:text-gray-300 py-2">About</router-link>
+        <router-link to="/contact" class="block text-white hover:text-gray-300 py-2">Contact Us</router-link>
       </template>
     </div>
   </header>
 </template>
 
 <script>
-import logo from '../assets/amastore.jpg'; // Ganti dengan path gambar yang sesuai
+import logo from '../assets/amastore.jpg';
 import { useAuthStore } from "../store/auth.js";
 
 export default {
@@ -57,17 +61,14 @@ export default {
   data() {
     return {
       isMobileMenuOpen: false,
-      logo, // Menyimpan logo dalam data
+      logo,
     };
   },
   computed: {
     role() {
       const authStore = useAuthStore();
-      return authStore.role;
+      return authStore.role; // Ambil role dari store
     },
-    hideNavbar() {
-      return this.$route.meta.hideNavbar;
-    }
   },
   methods: {
     toggleMenu() {
@@ -76,8 +77,8 @@ export default {
     logout() {
       const authStore = useAuthStore();
       authStore.logout();
-    }
-  }
+    },
+  },
 };
 </script>
 
