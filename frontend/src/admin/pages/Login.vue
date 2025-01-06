@@ -97,7 +97,6 @@ export default {
       password: password.value
     };
 
-    // Kirim request ke API dengan endpoint baru
     const response = await axios.post('http://localhost:5000/auth/login', requestData, {
       headers: {
         'Content-Type': 'application/json'

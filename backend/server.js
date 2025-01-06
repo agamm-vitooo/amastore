@@ -1,15 +1,15 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import cors from 'cors'; // Sudah di-import dengan benar
+import cors from 'cors';
 
 dotenv.config();
 const app = express();
 
 // Konfigurasi CORS
 app.use(cors({
-    origin: 'http://localhost:5173', // URL asal frontend
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Metode yang diizinkan
-    credentials: true, // Izinkan pengiriman cookies atau header otentikasi
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
 }));
 
 // Middleware untuk parsing JSON

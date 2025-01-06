@@ -1,4 +1,3 @@
-// router/index.js
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '../store/auth.js';
 
@@ -8,6 +7,7 @@ import Home from '../pages/Home.vue';
 // Admin Routes
 import Admin from '../admin/pages/Dashboard.vue';
 import Login from '../admin/pages/Login.vue';
+import Hero from '../admin/pages/Hero.vue';
 
 const routes = [
     // Client Routes
@@ -18,6 +18,11 @@ const routes = [
         path: '/admin',
         component: Admin,
         meta: { requiresAuth: true },
+        children: [{
+            path: 'hero',
+            component: Hero,
+            meta: { requiresAuth: true, role: 'admin' },
+        }, ],
     },
     { path: '/login', component: Login, meta: { hideNavbar: true } },
 ];
@@ -30,11 +35,16 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
     const authStore = useAuthStore();
 
-    // Mengecek apakah halaman yang ingin diakses membutuhkan autentikasi
+    // Check authentication
     if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-        // Jika tidak login, redirect ke halaman login
         return next('/login');
     }
+
+    // Check role
+    if (to.meta.role && to.meta.role !== authStore.role) {
+        return next('/'); // Redirect ke home jika role tidak sesuai
+    }
+
     next();
 });
 
